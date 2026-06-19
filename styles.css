@@ -161,3 +161,36 @@ body.mobile-build .hero-showcase-clean{grid-template-columns:1fr!important;min-h
 body.mobile-build .hero-skin-card{min-height:170px;}
 body.mobile-build .hero-skin-card img{height:108px;}
 @supports(height:100dvh){body.mobile-build .navlinks{max-height:70dvh;}body.mobile-build .modal-card{max-height:92dvh;}}
+
+
+/* mobile-v2 iOS tap hardening */
+html.mobile-hard-tap, html.mobile-hard-tap body { -webkit-touch-callout: none; }
+body.mobile-build .menu-backdrop:not(.force-open) { pointer-events: none; }
+body.mobile-build.nav-open .menu-backdrop { pointer-events: auto !important; }
+body.mobile-build .modal:not(.show) { display: none !important; pointer-events: none !important; }
+body.mobile-build .modal.show { display: flex !important; pointer-events: auto !important; }
+body.mobile-build button,
+body.mobile-build .btn,
+body.mobile-build .small-btn,
+body.mobile-build a,
+body.mobile-build [data-action],
+body.mobile-build [data-open-case],
+body.mobile-build [data-view-case],
+body.mobile-build [data-sell],
+body.mobile-build [data-upgrade-item],
+body.mobile-build [data-contract-item],
+body.mobile-build [data-close-modal] {
+  position: relative;
+  z-index: 2;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(255,255,255,.12);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+body.mobile-build .case-card:before,
+body.mobile-build .hero-skin-card:before,
+body.mobile-build .hero-showcase-clean:before { pointer-events: none !important; }
+body.mobile-build .case-card,
+body.mobile-build .item-card,
+body.mobile-build .panel { isolation: isolate; }

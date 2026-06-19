@@ -4,4 +4,4 @@
 
 Загружай содержимое этой папки в отдельный репозиторий/ветку GitHub Pages.
 
-Открывать: `index.html?clear=mobile-v1`.
+Открывать: `index.html?clear=mobile-v2`.

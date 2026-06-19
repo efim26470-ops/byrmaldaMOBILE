@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  const VERSION = 'mobile-1.0.0';
+  const VERSION = 'mobile-2.0.0';
   const LS_KEY = 'cs2_case_lab_save';
   const BACKUP_KEY = 'cs2_case_lab_session_backup';
   const WINDOW_SAVE_PREFIX = 'CS2_CASE_LAB_WINDOW_SAVE:';
@@ -17,7 +17,7 @@
   const API_ENDPOINTS = {crates:'crates.json', stickers:'stickers.json', agents:'agents.json', patches:'patches.json', keychains:'keychains.json', collectibles:'collectibles.json', skins:'skins.json', collections:'collections.json'};
   const RUB_PER_USD = 92;
   const CURRENCY = '₽LC';
-  const PRICE_VERSION = 'market-rub-mobile-v1';
+  const PRICE_VERSION = 'market-rub-mobile-v2';
   const WHEEL_COOLDOWN = 2 * 60 * 60 * 1000;
   const AD_DAILY_LIMIT = 10;
   const AD_REWARD = 750;
@@ -370,6 +370,7 @@
       initResponsiveMenu();
       initInstallPrompt();
       bindEvents();
+      initMobileHardTapFix();
       initMobileOnlyRuntime();
       purgeOldCaches();
       // v23: service worker отключён, чтобы телефон не держал старый JS/картинки.
@@ -407,7 +408,7 @@
     }catch(err){
       console.error('Boot failed, emergency mode:', err);
       try{ addToasts(); }catch(e){}
-      try{ bindEvents(); initMobileOnlyRuntime(); }catch(e){}
+      try{ bindEvents(); initMobileHardTapFix(); initMobileOnlyRuntime(); }catch(e){}
       try{ catalog = buildOfflineCatalog(); updateHeroShowcase(); route(); renderGlobals(); }catch(e){}
       try{ toast('Включён аварийный мобильный режим. Обнови страницу, если интерфейс загрузился не полностью.','warn'); }catch(e){}
     }
@@ -1527,6 +1528,134 @@
     }, {passive:true});
   }
 
+
+
+  // mobile-v2: iOS hard tap fix. Safari sometimes drops delegated click/touch on
+  // dynamically rendered buttons. This function attaches direct handlers to every
+  // actionable element and also listens on document in capture phase.
+  function initMobileHardTapFix(){
+    if(document.documentElement.dataset.mobileHardTapFix === '1') return;
+    document.documentElement.dataset.mobileHardTapFix = '1';
+    document.documentElement.classList.add('mobile-hard-tap');
+
+    const selector = '[data-action],[data-open-case],[data-view-case],[data-sell],[data-upgrade-item],[data-contract-item],[data-close-modal]';
+    let sx = 0, sy = 0, moved = false, lastKey = '', lastAt = 0;
+
+    function findActionTarget(e){
+      let el = e && e.target && e.target.closest ? e.target.closest(selector) : null;
+      if(el) return el;
+      try{
+        const t = e && e.changedTouches && e.changedTouches[0];
+        if(t){
+          const hit = document.elementFromPoint(t.clientX, t.clientY);
+          if(hit && hit.closest) el = hit.closest(selector);
+        }
+      }catch(err){}
+      return el;
+    }
+    function run(el){
+      if(!el || el.disabled || el.getAttribute('aria-disabled') === 'true') return false;
+      const key = (el.dataset.action || el.dataset.openCase || el.dataset.viewCase || el.dataset.sell || el.dataset.upgradeItem || el.dataset.contractItem || 'close') + ':' + (el.dataset.uid || el.dataset.count || '');
+      const now = Date.now();
+      if(key === lastKey && now - lastAt < 360) return true;
+      lastKey = key; lastAt = now;
+
+      if(el.matches('[data-close-modal]')){ closeModal(el.closest('.modal')); return true; }
+      if(el.dataset.openCase){ openCaseModal(el.dataset.openCase, true); return true; }
+      if(el.dataset.viewCase){ openCaseModal(el.dataset.viewCase, false); return true; }
+      if(el.dataset.sell){ sellItem(el.dataset.sell); return true; }
+      if(el.dataset.upgradeItem){ state.pendingUpgrade = el.dataset.upgradeItem; save(); location.href = 'upgrade.html'; return true; }
+      if(el.dataset.contractItem){ toggleContract(el.dataset.contractItem); route(); toast('Выбор контракта обновлён','good'); return true; }
+      const a = el.dataset.action;
+      if(!a) return false;
+      if(a === 'spin-current-case'){ spinCase(currentCase, {fast:false,count:1}); return true; }
+      if(a === 'spin-fast'){ spinCase(currentCase, {fast:true,count:1}); return true; }
+      if(a === 'open-again'){ spinCase(currentCase, {fast:false,count:1}); return true; }
+      if(a === 'open-again-fast'){ spinCase(currentCase, {fast:true,count:1}); return true; }
+      if(a === 'open-multi'){ spinCase(currentCase, {fast:true,count:el.dataset.count||1}); return true; }
+      if(a === 'sell-batch'){ sellBatch((el.dataset.uids||'').split(',').filter(Boolean)); return true; }
+      if(a === 'redeem-promo'){ redeemPromo(); return true; }
+      if(a === 'spin-wheel'){ spinWheel(); return true; }
+      if(a === 'start-ad'){ startAd(); return true; }
+      if(a === 'start-battle'){ startBattle(); return true; }
+      if(a === 'make-contract'){ makeContract(); return true; }
+      if(a === 'clear-contract'){ state.contractSelected=[]; save(); route(); return true; }
+      if(a === 'do-upgrade'){ doUpgrade(); return true; }
+      if(a === 'sell-cheap'){ sellCheap(); return true; }
+      if(a === 'sell-all-inventory'){ sellAllInventory(); return true; }
+      if(a === 'reset-save'){ resetSave(); return true; }
+      if(a === 'export-save'){ exportSave(); return true; }
+      if(a === 'import-save'){ importSave(); return true; }
+      if(a === 'add-debug-coins'){ earn(10000, 'Тестовое начисление'); return true; }
+      if(a === 'install-pwa'){ installPWA(); return true; }
+      if(a === 'show-ios'){ showIOSGuide(); return true; }
+      return false;
+    }
+    function handler(e){
+      if(e.type === 'touchend' && moved) return;
+      const el = findActionTarget(e);
+      if(!el) return;
+      if(run(el)){
+        try{ e.preventDefault(); e.stopPropagation(); }catch(err){}
+      }
+    }
+    document.addEventListener('touchstart', e => {
+      const t = e.changedTouches && e.changedTouches[0];
+      sx = t ? t.clientX : 0; sy = t ? t.clientY : 0; moved = false;
+    }, {passive:true, capture:true});
+    document.addEventListener('touchmove', e => {
+      const t = e.changedTouches && e.changedTouches[0];
+      if(t && (Math.abs(t.clientX - sx) > 16 || Math.abs(t.clientY - sy) > 16)) moved = true;
+    }, {passive:true, capture:true});
+    document.addEventListener('touchend', handler, {passive:false, capture:true});
+    document.addEventListener('pointerup', e => {
+      if(e.pointerType === 'touch' || e.pointerType === 'pen') handler(e);
+    }, {passive:false, capture:true});
+    document.addEventListener('click', e => {
+      const el = findActionTarget(e);
+      if(!el) return;
+      // normal desktop click still works; this is only a direct fallback
+      if(run(el)){
+        try{ e.preventDefault(); e.stopPropagation(); }catch(err){}
+      }
+    }, {capture:true});
+
+    // Direct fallback on current and future nodes.
+    function wire(root=document){
+      $$(selector, root).forEach(el => {
+        if(el.dataset.mobileWired === '1') return;
+        el.dataset.mobileWired = '1';
+        el.style.cursor = 'pointer';
+        el.addEventListener('touchend', e => { if(!moved && run(el)){ e.preventDefault(); e.stopPropagation(); } }, {passive:false});
+        el.addEventListener('click', e => { if(run(el)){ e.preventDefault(); e.stopPropagation(); } }, {capture:false});
+      });
+      $$('a[href]', root).forEach(a => {
+        if(a.dataset.mobileLinkWired === '1' || a.hasAttribute('download')) return;
+        a.dataset.mobileLinkWired = '1';
+        a.style.cursor = 'pointer';
+        a.addEventListener('touchend', e => {
+          if(moved) return;
+          if(a.closest(selector)) return;
+          const href = a.getAttribute('href') || '';
+          if(!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+          if(a.target && a.target !== '_self') return;
+          e.preventDefault();
+          document.body.classList.remove('nav-open');
+          location.href = href;
+        }, {passive:false});
+      });
+    }
+    wire(document);
+    const mo = new MutationObserver(muts => muts.forEach(m => m.addedNodes && m.addedNodes.forEach(n => { if(n.nodeType === 1) wire(n); })));
+    try{ mo.observe(document.body, {childList:true, subtree:true}); }catch(e){}
+    setInterval(() => {
+      wire(document);
+      const bd = document.querySelector('.menu-backdrop');
+      if(bd && !document.body.classList.contains('nav-open')) bd.style.pointerEvents = 'none';
+      $$('.modal:not(.show)').forEach(m => { m.style.pointerEvents = 'none'; });
+      $$('.modal.show').forEach(m => { m.style.pointerEvents = 'auto'; });
+    }, 450);
+  }
 
   // v30: non-invasive iOS tap insurance. It does NOT replace desktop click logic.
   // It only mirrors touch/pointer activation into the same internal actions if iOS drops click.
