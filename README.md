@@ -1,7 +1,24 @@
-# CS2 Case Lab Mobile
+# CS2 Mobile Lab — clean mobile build
 
-Отдельная мобильная сборка для iPhone/Android. Сделана от desktop v30, но с мобильными обработчиками touch/click и интерфейсом под телефон.
+Отдельная мобильная сборка с нуля. Работает как статический сайт на GitHub Pages.
 
-Загружай содержимое этой папки в отдельный репозиторий/ветку GitHub Pages.
+## Загрузка на GitHub Pages
 
-Открывать: `index.html?clear=mobile-v2`.
+Загрузи в отдельный репозиторий или отдельную папку все файлы из этой папки:
+
+- `index.html`
+- `styles.css`
+- `app.js`
+- `manifest.webmanifest`
+- `favicon.svg`
+- `assets/`
+
+Открывай на телефоне через Safari/Chrome. Для iPhone лучше добавить на экран домой через Safari.
+
+## Промокоды
+
+- `WELCOMEMOBILE` — 5 000 ₽LC
+- `IOSFIX` — 10 000 ₽LC
+- `FASTCASE` — 3 000 ₽LC
+- `MOBILEKING` — 15 000 ₽LC
+- `TEST100K` — 100 000 ₽LC

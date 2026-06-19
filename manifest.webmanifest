@@ -1,45 +1,13 @@
 {
-  "name": "CS2 Case Mobile Mobile",
-  "short_name": "Case Mobile",
-  "description": "Фан-симулятор открытия кейсов CS2, оптимизированный для iOS, Windows и GitHub Pages",
-  "start_url": "./index.html?v=30.0.0",
-  "scope": "./",
+  "name": "CS2 Mobile Lab",
+  "short_name": "CS2 Lab",
+  "start_url": "index.html?app=ios",
   "display": "standalone",
   "background_color": "#080d18",
-  "theme_color": "#090c13",
+  "theme_color": "#080d18",
   "icons": [
-    {
-      "src": "assets/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/icons/maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "assets/icons/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ],
-  "id": "cs2-case-lab-v23",
-  "display_override": [
-    "standalone",
-    "minimal-ui",
-    "browser"
-  ],
-  "orientation": "portrait-primary",
-  "categories": [
-    "games",
-    "entertainment"
+    {"src":"assets/icons/icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"assets/icons/icon-512.png","sizes":"512x512","type":"image/png"},
+    {"src":"assets/icons/apple-touch-icon.png","sizes":"180x180","type":"image/png"}
   ]
 }
