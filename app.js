@@ -2,8 +2,8 @@
 (function(){
   'use strict';
 
-  const VERSION = 'mobile-clean-3.0.0';
-  const SAVE_KEY = 'cs2_mobile_clean_save_v3';
+  const VERSION = 'mobile-clean-4.0.0';
+  const SAVE_KEY = 'cs2_mobile_clean_save_v4';
   const CURRENCY = '₽LC';
   const START_BALANCE = 15000;
   const WHEEL_COOLDOWN = 2 * 60 * 60 * 1000;
@@ -11,7 +11,7 @@
   const AD_REWARD = 750;
   const PROMOS = Object.freeze({
     WELCOMEMOBILE:5000, IOSFIX:10000, FASTCASE:3000, MOBILEKING:15000,
-    TEST100K:100000, KNIFEDREAM:25000, RUBLEDROP:12000, CLEANV3:20000
+    TEST100K:100000, KNIFEDREAM:25000, RUBLEDROP:12000, CLEANV3:20000, CLEANV4:30000
   });
 
   const $ = (s,r=document)=>r.querySelector(s);
@@ -81,15 +81,23 @@
   function priceFor(name, rarity, type='skin'){
     const n=String(name||'').toLowerCase();
     const anchors = [
-      ['dragon lore', 440000], ['gungnir', 560000], ['howl', 520000], ['wild lotus', 330000], ['medusa', 220000], ['case hardened', 22000], ['vulcan', 18500], ['printstream', 8800], ['asiimov', 10500], ['hyper beast', 6900], ['redline', 3000], ['empress', 6200], ['doppler', 82000], ['fade', 76000], ['crimson web', 52000], ['vice', 72000], ['pandora', 140000]
+      ['dragon lore', 720000], ['gungnir', 610000], ['howl', 560000], ['wild lotus', 360000], ['medusa', 260000], ['poseidon', 170000], ['prince', 165000],
+      ['welcome to the jungle', 180000], ['gold arabesque', 150000], ['fire serpent', 72000], ['hydroponic', 64000], ['icarus fell', 46000], ['blue phosphor', 42000],
+      ['case hardened', 38000], ['vulcan', 18500], ['fuel injector', 14500], ['bloodsport', 8200], ['the empress', 7600], ['head shot', 5400], ['redline', 3200], ['legion of anubis', 2300], ['ice coaled', 1450], ['slate', 600],
+      ['asiimov', 11200], ['hyper beast', 7400], ['neo-noir', 3300], ['containment breach', 8400], ['chromatic aberration', 3400], ['duality', 950], ['fever dream', 650], ['paw', 320],
+      ['printstream', 9200], ['decimator', 1900], ['nightmare', 1250], ['player two', 3100], ['mecha industries', 1200], ['temukau', 7600], ['bullet queen', 1800], ['water elemental', 950],
+      ['doppler', 92000], ['gamma doppler', 118000], ['fade', 98000], ['marble fade', 90000], ['slaughter', 52000], ['crimson web', 56000], ['tiger tooth', 72000], ['case hardened', 62000],
+      ['vice', 98000], ['pandora', 170000], ['king snake', 42000], ['imperial plaid', 47000], ['racing green', 16000], ['jade', 22000]
     ];
     for(const [key,val] of anchors){ if(n.includes(key)) return val; }
-    if(type==='knife') return 52000 + Math.round(rnd()*52000);
-    if(type==='glove') return 38000 + Math.round(rnd()*76000);
-    if(type==='sticker') return n.includes('katowice') ? 95000 : (rarity==='Exotic'?1800:rarity==='Remarkable'?520:180);
-    if(type==='agent') return rarity==='Master Agent'||rarity==='Master' ? 5600 : 1200;
-    const base = {'Consumer Grade':45,'Base Grade':35,'Industrial Grade':95,'Mil-Spec Grade':220,'Restricted':620,'Classified':1900,'Covert':5200,'Contraband':120000,'High Grade':180,'Remarkable':520,'Exotic':1800}[rarity] || 350;
-    return Math.max(25, Math.round(base * (0.75 + rnd()*0.7)));
+    if(type==='knife') return 54000 + Math.round(rnd()*86000);
+    if(type==='glove') return 32000 + Math.round(rnd()*110000);
+    if(type==='sticker') return n.includes('katowice 2014') ? 950000 : n.includes('gold') ? 9000 : (rarity==='Extraordinary'?4200:rarity==='Exotic'?1900:rarity==='Remarkable'?560:160);
+    if(type==='agent') return rarity==='Master Agent'||rarity==='Master' ? 6200 : rarity==='Superior'?2600:1150;
+    if(type==='charm'||type==='patch') return rarity==='Exotic'?2400:rarity==='Remarkable'?850:260;
+    const base = {'Consumer Grade':35,'Base Grade':30,'Industrial Grade':90,'Mil-Spec Grade':230,'Restricted':720,'Classified':2100,'Covert':5800,'Contraband':140000,'High Grade':160,'Remarkable':560,'Exotic':1900}[rarity] || 360;
+    const spread = .72 + rnd()*.82;
+    return Math.max(25, Math.round(base * spread));
   }
   function normItem(raw, type='skin'){
     const name = raw.name || raw.market_hash_name || 'CS2 Item';
@@ -103,22 +111,71 @@
     return {id,name,rarity,value,rarityColor:rarityColor[rarity]||'#60a5fa',weight:baseWeights[rarity]||8,image:img,type};
   }
   function buildFallbackItems(){
+    const skin = (id,name,rarity,value,img=REAL.akRedline,type='skin') => localItem(id,name,rarity,value,img,type);
     return [
-      localItem('ak-redline','AK-47 | Redline','Classified',3000,REAL.akRedline),
-      localItem('awp-hyper','AWP | Hyper Beast','Covert',6900,REAL.awpHyper),
-      localItem('karambit-doppler','★ Karambit | Doppler','Rare Special Item',82000,REAL.karambit,'knife'),
-      localItem('ak-vulcan','AK-47 | Vulcan','Covert',18500,REAL.akRedline),
-      localItem('awp-asiimov','AWP | Asiimov','Covert',10500,REAL.awpHyper),
-      localItem('m4-print','M4A1-S | Printstream','Covert',8800,REAL.akRedline),
-      localItem('de-print','Desert Eagle | Printstream','Covert',4200,REAL.akRedline),
-      localItem('glock-water','Glock-18 | Water Elemental','Classified',920,REAL.akRedline),
-      localItem('tec-isaac','Tec-9 | Isaac','Mil-Spec Grade',190,REAL.akRedline),
-      localItem('butterfly-doppler','★ Butterfly Knife | Doppler','Rare Special Item',76000,REAL.karambit,'knife')
+      skin('ak-redline','AK-47 | Redline','Classified',3200,REAL.akRedline),
+      skin('awp-hyper','AWP | Hyper Beast','Covert',7400,REAL.awpHyper),
+      skin('karambit-doppler','★ Karambit | Doppler','Rare Special Item',92000,REAL.karambit,'knife'),
+      skin('ak-vulcan','AK-47 | Vulcan','Covert',18500,REAL.akRedline),
+      skin('ak-empress','AK-47 | The Empress','Covert',7600,REAL.akRedline),
+      skin('ak-headshot','AK-47 | Head Shot','Covert',5400,REAL.akRedline),
+      skin('ak-legion','AK-47 | Legion of Anubis','Covert',2300,REAL.akRedline),
+      skin('ak-ice','AK-47 | Ice Coaled','Classified',1450,REAL.akRedline),
+      skin('awp-asiimov','AWP | Asiimov','Covert',11200,REAL.awpHyper),
+      skin('awp-duality','AWP | Duality','Classified',950,REAL.awpHyper),
+      skin('awp-fever','AWP | Fever Dream','Classified',650,REAL.awpHyper),
+      skin('awp-neo','AWP | Neo-Noir','Covert',3300,REAL.awpHyper),
+      skin('m4-print','M4A1-S | Printstream','Covert',9200,REAL.akRedline),
+      skin('m4-decimator','M4A1-S | Decimator','Classified',1900,REAL.akRedline),
+      skin('m4-nightmare','M4A1-S | Nightmare','Classified',1250,REAL.akRedline),
+      skin('m4-temukau','M4A4 | Temukau','Covert',7600,REAL.akRedline),
+      skin('de-print','Desert Eagle | Printstream','Covert',4200,REAL.akRedline),
+      skin('de-ocean','Desert Eagle | Ocean Drive','Covert',2600,REAL.akRedline),
+      skin('usp-kill','USP-S | Kill Confirmed','Covert',5400,REAL.akRedline),
+      skin('usp-cortex','USP-S | Cortex','Classified',800,REAL.akRedline),
+      skin('glock-water','Glock-18 | Water Elemental','Classified',950,REAL.akRedline),
+      skin('glock-bullet','Glock-18 | Bullet Queen','Covert',1800,REAL.akRedline),
+      skin('p250-asiimov','P250 | Asiimov','Classified',780,REAL.akRedline),
+      skin('tec-isaac','Tec-9 | Isaac','Mil-Spec Grade',190,REAL.akRedline),
+      skin('mp9-food','MP9 | Food Chain','Classified',980,REAL.akRedline),
+      skin('mac-neon','MAC-10 | Neon Rider','Covert',1700,REAL.akRedline),
+      skin('p90-death','P90 | Death Grip','Restricted',420,REAL.akRedline),
+      skin('ssg-fever','SSG 08 | Fever Dream','Restricted',380,REAL.awpHyper),
+      skin('famas-mecha','FAMAS | Mecha Industries','Classified',1200,REAL.akRedline),
+      skin('galil-chat','Galil AR | Chatterbox','Covert',2100,REAL.akRedline),
+      skin('butterfly-doppler','★ Butterfly Knife | Doppler','Rare Special Item',98000,REAL.karambit,'knife'),
+      skin('m9-fade','★ M9 Bayonet | Fade','Rare Special Item',105000,REAL.karambit,'knife'),
+      skin('bayonet-tiger','★ Bayonet | Tiger Tooth','Rare Special Item',76000,REAL.karambit,'knife'),
+      skin('sport-vice','★ Sport Gloves | Vice','Extraordinary',98000,REAL.karambit,'glove'),
+      skin('driver-king','★ Driver Gloves | King Snake','Extraordinary',42000,REAL.karambit,'glove')
     ];
   }
+
   function buildFallbackCases(pool){
-    const names = ['Kilowatt Case','Revolution Case','Recoil Case','Dreams & Nightmares Case','Snakebite Case','Fracture Case','Clutch Case','Prisma 2 Case','Spectrum 2 Case','Gamma 2 Case','Glove Case','Chroma 3 Case'];
-    return names.map((name,i)=>({id:slug(name),name,price:[840,501,690,760,420,390,620,520,740,980,1400,650][i]||600,image:FALLBACK_CASE_IMAGES[name]||REAL.kilowatt,items:pool,profit:.25+rnd()*.18}));
+    const skinsOnly = pool.filter(x=>x.type==='skin');
+    const knives = pool.filter(x=>x.type==='knife');
+    const gloves = pool.filter(x=>x.type==='glove');
+    const official = [
+      ['kilowatt-case','Kilowatt Case',840,'Kilowatt Case'], ['revolution-case','Revolution Case',620,'Revolution Case'], ['recoil-case','Recoil Case',690,'Recoil Case'], ['dreams-nightmares','Dreams & Nightmares Case',760,'Dreams & Nightmares Case'],
+      ['snakebite-case','Snakebite Case',420,'Snakebite Case'], ['fracture-case','Fracture Case',390,'Fracture Case'], ['clutch-case','Clutch Case',620,'Clutch Case'], ['prisma-2-case','Prisma 2 Case',520,'Prisma 2 Case'],
+      ['spectrum-2-case','Spectrum 2 Case',740,'Spectrum 2 Case'], ['gamma-2-case','Gamma 2 Case',980,'Gamma 2 Case'], ['glove-case','Glove Case',1400,'Glove Case'], ['chroma-3-case','Chroma 3 Case',650,'Chroma 3 Case'],
+      ['horizon-case','Horizon Case',560,'Kilowatt Case'], ['danger-zone-case','Danger Zone Case',470,'Fracture Case'], ['cs20-case','CS20 Case',820,'Revolution Case'], ['broken-fang-case','Operation Broken Fang Case',1150,'Glove Case'],
+      ['gallery-case','Gallery Case',780,'Kilowatt Case'], ['fever-case','Fever Case',640,'Dreams & Nightmares Case']
+    ].map((x,i)=>({id:x[0],name:x[1],price:x[2],image:FALLBACK_CASE_IMAGES[x[3]]||REAL.kilowatt,items:rotatePool(pool,i,28),profit:.18+(i%6)*.035}));
+    const special = [
+      {id:'budget-case',name:'Budget Blue Case',price:240,image:FALLBACK_CASE_IMAGES['Snakebite Case']||REAL.kilowatt,items:skinsOnly.filter(i=>['Mil-Spec Grade','Restricted','Industrial Grade'].includes(i.rarity)).concat(skinsOnly).slice(0,32),profit:.34},
+      {id:'purple-case',name:'Purple Restricted Case',price:850,image:FALLBACK_CASE_IMAGES['Fracture Case']||REAL.kilowatt,items:skinsOnly.filter(i=>i.rarity==='Restricted'||i.rarity==='Classified').concat(skinsOnly).slice(0,28),profit:.27},
+      {id:'pink-case',name:'Pink Classified Case',price:2200,image:FALLBACK_CASE_IMAGES['Prisma 2 Case']||REAL.kilowatt,items:skinsOnly.filter(i=>i.rarity==='Classified'||i.rarity==='Covert').concat(skinsOnly).slice(0,28),profit:.22},
+      {id:'red-case',name:'Red Covert Case',price:5600,image:FALLBACK_CASE_IMAGES['Revolution Case']||REAL.kilowatt,items:skinsOnly.filter(i=>i.rarity==='Covert').concat(skinsOnly).slice(0,28),profit:.17},
+      {id:'knife-case',name:'Knife Case',price:36000,image:REAL.karambit,items:knives.length?knives:pool.filter(i=>i.type==='knife'),profit:.14},
+      {id:'gloves-case',name:'Gloves Case',price:29000,image:REAL.karambit,items:gloves.length?gloves:pool.filter(i=>i.type==='glove'),profit:.15},
+      {id:'knife-glove-case',name:'Knives & Gloves Case',price:42000,image:REAL.karambit,items:knives.concat(gloves).length?knives.concat(gloves):pool.filter(i=>i.type==='knife'||i.type==='glove'),profit:.13}
+    ].filter(c=>c.items && c.items.length);
+    return official.concat(special);
+  }
+  function rotatePool(pool, start, count){
+    const arr = pool && pool.length ? pool : buildFallbackItems();
+    return Array.from({length:Math.min(count, arr.length)}, (_,i)=>arr[(start+i)%arr.length]);
   }
 
   async function fetchJSON(url, ms=4500){
@@ -145,7 +202,7 @@
       const charms = keychainsRes.status==='fulfilled' && Array.isArray(keychainsRes.value) ? keychainsRes.value : [];
       const patches = patchesRes.status==='fulfilled' && Array.isArray(patchesRes.value) ? patchesRes.value : [];
       if(skins.length < 20) throw new Error('skins empty');
-      const wanted = ['AK-47 | Redline','AK-47 | Vulcan','AK-47 | The Empress','AK-47 | Head Shot','M4A1-S | Printstream','M4A1-S | Decimator','M4A4 | Temukau','M4A4 | Neo-Noir','AWP | Asiimov','AWP | Hyper Beast','AWP | Duality','AWP | Fever Dream','Desert Eagle | Printstream','Desert Eagle | Ocean Drive','USP-S | Kill Confirmed','USP-S | Cortex','Glock-18 | Water Elemental','Glock-18 | Bullet Queen','P250 | Asiimov','Tec-9 | Isaac','MP9 | Food Chain','MAC-10 | Neon Rider','P90 | Death Grip','SSG 08 | Fever Dream','FAMAS | Mecha Industries','Galil AR | Chatterbox','★ Karambit | Doppler','★ Karambit | Gamma Doppler','★ Butterfly Knife | Doppler','★ M9 Bayonet | Fade'];
+      const wanted = ['AK-47 | Redline','AK-47 | Vulcan','AK-47 | The Empress','AK-47 | Head Shot','AK-47 | Legion of Anubis','AK-47 | Ice Coaled','AK-47 | Slate','M4A1-S | Printstream','M4A1-S | Decimator','M4A1-S | Nightmare','M4A1-S | Player Two','M4A4 | Temukau','M4A4 | Neo-Noir','AWP | Asiimov','AWP | Hyper Beast','AWP | Duality','AWP | Fever Dream','AWP | Neo-Noir','AWP | Chromatic Aberration','Desert Eagle | Printstream','Desert Eagle | Ocean Drive','USP-S | Kill Confirmed','USP-S | Cortex','Glock-18 | Water Elemental','Glock-18 | Bullet Queen','P250 | Asiimov','Tec-9 | Isaac','MP9 | Food Chain','MAC-10 | Neon Rider','P90 | Death Grip','SSG 08 | Fever Dream','FAMAS | Mecha Industries','Galil AR | Chatterbox','★ Karambit | Doppler','★ Karambit | Gamma Doppler','★ Butterfly Knife | Doppler','★ M9 Bayonet | Fade','★ Bayonet | Tiger Tooth','★ Sport Gloves | Vice','★ Driver Gloves | King Snake'];
       const byName = new Map(skins.map(x=>[String(x.name||'').toLowerCase(),x]));
       let realItems = wanted.map(n=>byName.get(n.toLowerCase())).filter(Boolean).map(x=>normItem(x, /knife|bayonet|karambit|butterfly/i.test(x.name)?'knife':'skin'));
       skins.forEach(x=>{ if(realItems.length<72 && x.image && !realItems.some(i=>i.name===x.name)) realItems.push(normItem(x)); });
@@ -154,28 +211,36 @@
       const charmItems = charms.filter(x=>x.image).slice(0,8).map(x=>normItem(x,'charm'));
       const patchItems = patches.filter(x=>x.image).slice(0,6).map(x=>normItem(x,'patch'));
       items = realItems.concat(stickerItems, agentItems, charmItems, patchItems).filter(uniqueByName);
-      const crateWanted = ['Kilowatt Case','Revolution Case','Recoil Case','Dreams & Nightmares Case','Snakebite Case','Fracture Case','Clutch Case','Prisma 2 Case','Spectrum 2 Case','Gamma 2 Case','Glove Case','Chroma 3 Case','Operation Broken Fang Case','Fever Case','Gallery Case'];
+      const crateWanted = ['Kilowatt Case','Revolution Case','Recoil Case','Dreams & Nightmares Case','Snakebite Case','Fracture Case','Clutch Case','Prisma 2 Case','Spectrum 2 Case','Gamma 2 Case','Glove Case','Chroma 3 Case','Horizon Case','Danger Zone Case','CS20 Case','Operation Broken Fang Case','Operation Riptide Case','Gallery Case','Fever Case','Prisma Case','Spectrum Case','Chroma 2 Case','Chroma Case','Falchion Case','Shadow Case','Operation Wildfire Case','Operation Vanguard Weapon Case','Operation Phoenix Weapon Case','Huntsman Weapon Case'];
       const crateBy = new Map(crates.map(c=>[String(c.name||'').toLowerCase(), c]));
       let realCases = crateWanted.map((name,idx)=>{
         const c = crateBy.get(name.toLowerCase());
         if(!c) return null;
         const poolRaw = ([]).concat(Array.isArray(c.contains)?c.contains:[], Array.isArray(c.contains_rare)?c.contains_rare:[]);
-        let pool = poolRaw.filter(x=>x && x.image).map(x=>normItem(x, /knife|bayonet|karambit|butterfly|glove/i.test(x.name||'')?'knife':'skin')).filter(uniqueByName);
-        if(pool.length<8) pool = items.filter(x=>['skin','knife','glove'].includes(x.type)).slice(idx, idx+24);
-        return {id:slug(c.name), name:c.name, price:casePrice(c.name, idx), image:fixImageUrl(c.image)||FALLBACK_CASE_IMAGES[c.name]||REAL.kilowatt, items:pool, profit:.22 + (idx%5)*.045};
+        let pool = poolRaw.filter(x=>x && x.name && x.image).map(x=>normItem(x, /knife|bayonet|karambit|butterfly|glove/i.test(x.name||'')?'knife':'skin')).filter(uniqueByName);
+        if(pool.length<10) pool = rotatePool(items.filter(x=>['skin','knife','glove'].includes(x.type)), idx*3, 34);
+        return {id:slug(c.name), name:c.name, price:casePrice(c.name, idx), image:fixImageUrl(c.image)||FALLBACK_CASE_IMAGES[c.name]||REAL.kilowatt, items:pool, profit:.16 + (idx%7)*.032};
       }).filter(Boolean);
       const skinsOnly = items.filter(x=>x.type==='skin');
       const knives = items.filter(x=>x.type==='knife');
       const stickersOnly = items.filter(x=>x.type==='sticker');
       const agentsAll = items.filter(x=>['agent','charm','patch'].includes(x.type));
       realCases = realCases.concat([
-        {id:'budget-blue',name:'Budget Blue Case',price:220,image:realCases[5]?.image||REAL.kilowatt,items:skinsOnly.filter(x=>['Mil-Spec Grade','Restricted','Industrial Grade'].includes(x.rarity)).slice(0,32),profit:.20},
-        {id:'red-covert',name:'Red Covert Case',price:4200,image:realCases[1]?.image||REAL.kilowatt,items:skinsOnly.filter(x=>['Covert','Classified'].includes(x.rarity)).slice(0,36),profit:.18},
-        {id:'knife-case',name:'Knife Case',price:24500,image:REAL.karambit,items:knives.length?knives:items.filter(x=>x.type==='knife'),profit:.16},
-        {id:'stickers-case',name:'Tournament Stickers',price:350,image:stickersOnly[0]?.image||realCases[0]?.image||REAL.kilowatt,items:stickersOnly.length?stickersOnly:items.slice(0,8),profit:.38},
-        {id:'agents-charms',name:'Agents & Charms',price:950,image:agentsAll[0]?.image||realCases[0]?.image||REAL.kilowatt,items:agentsAll.length?agentsAll:items.slice(0,8),profit:.34}
+        {id:'budget-blue',name:'Budget Blue Case',price:240,image:realCases[5]?.image||REAL.kilowatt,items:skinsOnly.filter(x=>['Mil-Spec Grade','Restricted','Industrial Grade'].includes(x.rarity)).slice(0,40),profit:.34},
+        {id:'green-industrial',name:'Green Industrial Case',price:160,image:realCases[0]?.image||REAL.kilowatt,items:skinsOnly.filter(x=>['Consumer Grade','Industrial Grade','Mil-Spec Grade'].includes(x.rarity)).slice(0,40),profit:.42},
+        {id:'purple-restricted',name:'Purple Restricted Case',price:850,image:realCases[6]?.image||REAL.kilowatt,items:skinsOnly.filter(x=>['Restricted','Classified'].includes(x.rarity)).slice(0,40),profit:.27},
+        {id:'pink-classified',name:'Pink Classified Case',price:2300,image:realCases[7]?.image||REAL.kilowatt,items:skinsOnly.filter(x=>['Classified','Covert'].includes(x.rarity)).slice(0,40),profit:.22},
+        {id:'red-covert',name:'Red Covert Case',price:5600,image:realCases[1]?.image||REAL.kilowatt,items:skinsOnly.filter(x=>['Covert'].includes(x.rarity)).slice(0,40),profit:.16},
+        {id:'high-roller',name:'High Roller Case',price:12500,image:realCases[2]?.image||REAL.kilowatt,items:skinsOnly.filter(x=>x.value>5000).concat(knives).slice(0,40),profit:.13},
+        {id:'knife-case',name:'Knife Case',price:36000,image:REAL.karambit,items:knives.length?knives:items.filter(x=>x.type==='knife'),profit:.14},
+        {id:'gloves-case',name:'Gloves Case',price:29000,image:REAL.karambit,items:items.filter(x=>x.type==='glove'),profit:.15},
+        {id:'knife-glove-case',name:'Knives & Gloves Case',price:42000,image:REAL.karambit,items:knives.concat(items.filter(x=>x.type==='glove')),profit:.13},
+        {id:'stickers-case',name:'Tournament Stickers',price:390,image:stickersOnly.find(x=>x.image)?.image||realCases[0]?.image||REAL.kilowatt,items:stickersOnly.filter(x=>x.image).slice(0,40),profit:.38},
+        {id:'agents-case',name:'Agents Case',price:1250,image:agentsAll.find(x=>x.image)?.image||realCases[0]?.image||REAL.kilowatt,items:agentsAll.filter(x=>x.image).slice(0,40),profit:.34},
+        {id:'charms-patches-case',name:'Charms & Patches Case',price:650,image:agentsAll.find(x=>x.type==='charm'&&x.image)?.image||realCases[0]?.image||REAL.kilowatt,items:agentsAll.filter(x=>['charm','patch'].includes(x.type)&&x.image).slice(0,40),profit:.35}
       ]);
       cases = realCases.filter(c=>c.items && c.items.length);
+      if(cases.length < 16) cases = buildFallbackCases(items);
       state.inventory.forEach(inv => { const src=items.find(i=>i.name===inv.name); if(src){ inv.image=src.image; inv.rarityColor=src.rarityColor; }});
       apiLoaded = true;
       save(false);
@@ -185,8 +250,12 @@
   function uniqueByName(x,idx,arr){ return x && x.name && arr.findIndex(y=>y.name===x.name)===idx; }
   function casePrice(name, idx){
     const n=String(name).toLowerCase();
-    if(n.includes('kilowatt')) return 840; if(n.includes('revolution')) return 501; if(n.includes('recoil')) return 690; if(n.includes('dream')) return 760; if(n.includes('snake')) return 420; if(n.includes('fracture')) return 390; if(n.includes('glove')) return 1400; if(n.includes('fever')) return 640;
-    return 500 + (idx%7)*120;
+    const m = [
+      ['kilowatt',840], ['revolution',620], ['recoil',690], ['dream',760], ['snake',420], ['fracture',390], ['clutch',620], ['prisma 2',520], ['spectrum 2',740], ['gamma 2',980], ['glove',1400], ['chroma 3',650],
+      ['horizon',560], ['danger zone',470], ['cs20',820], ['broken fang',1150], ['riptide',1750], ['gallery',780], ['fever',640], ['prisma',620], ['spectrum',940], ['chroma 2',850], ['chroma case',760], ['falchion',780], ['shadow',720], ['wildfire',1550], ['vanguard',2800], ['phoenix',1900], ['huntsman',2200]
+    ];
+    const hit=m.find(([k])=>n.includes(k));
+    return hit?hit[1]:500 + (idx%7)*140;
   }
 
   function defaultState(){return {balance:START_BALANCE,inventory:[],opened:0,earned:0,spent:0,sold:0,upgrades:0,contracts:0,battles:0,wins:0,lastWheel:0,adViews:{},usedPromos:[],tx:[]};}
@@ -240,7 +309,7 @@
   function renderWheel(app){ const left=Math.max(0,WHEEL_COOLDOWN-(now()-state.lastWheel)); app.innerHTML=pageTitle('Колесо бонусов','Одна прокрутка раз в 2 часа.')+`<div class="pointer"></div><div class="big-wheel" id="wheel"><span>LAB</span></div>${left?`<div class="notice">До следующей прокрутки: <b>${Math.ceil(left/60000)} мин.</b></div>`:`<button class="btn primary" data-action="spin-wheel">Крутить колесо</button>`}`; wireButtons(); }
   function renderBattle(app){ app.innerHTML=pageTitle('Battle','Открой кейс против бота. Победитель забирает оба предмета.')+`<div class="grid">${cases.slice(0,8).map(c=>`<div class="panel battle-card"><img src="${esc(c.image)}" alt=""><h3>${esc(c.name)}</h3><p class="price">${fmt(c.price)}</p><button class="btn primary" data-action="battle" data-case="${esc(c.id)}">Начать</button></div>`).join('')}</div>`; wireButtons(); }
   function renderAds(app){ const day=new Date().toISOString().slice(0,10); const used=state.adViews[day]||0; app.innerHTML=pageTitle('Реклама','10 секунд просмотра = 750 ₽LC.')+`<div class="notice">Сегодня: <b>${used}/${AD_LIMIT}</b></div><button class="btn primary" data-action="watch-ad" ${used>=AD_LIMIT?'disabled':''}>Смотреть рекламу</button>`; wireButtons(); }
-  function renderPromo(app){ app.innerHTML=pageTitle('Промокоды','Каждый код активируется один раз.')+`<div class="controls"><input class="field" id="promoInput" placeholder="Введите промокод"><button class="btn primary" data-action="promo">Активировать</button></div><div class="notice section">Рабочие: WELCOMEMOBILE, IOSFIX, FASTCASE, MOBILEKING, TEST100K, CLEANV3</div>`; wireButtons(); }
+  function renderPromo(app){ app.innerHTML=pageTitle('Промокоды','Каждый код активируется один раз.')+`<div class="controls"><input class="field" id="promoInput" placeholder="Введите промокод"><button class="btn primary" data-action="promo">Активировать</button></div><div class="notice section">Рабочие: WELCOMEMOBILE, IOSFIX, FASTCASE, MOBILEKING, TEST100K, CLEANV4</div>`; wireButtons(); }
   function renderProfile(app){ app.innerHTML=pageTitle('Профиль','Сохранение хранится на устройстве.')+statCards()+`<section class="section controls"><button class="btn blue" data-action="export">Экспорт save</button><textarea class="field" id="saveBox" rows="5" placeholder="save"></textarea><button class="btn" data-action="import">Импорт save</button><button class="btn red" data-action="reset">Сбросить прогресс</button></section>`; wireButtons(); }
   function renderInstall(app){ app.innerHTML=pageTitle('Установка','iPhone: Safari → Поделиться → На экран Домой.')+`<div class="notice">Эта мобильная сборка публикуется отдельно от desktop-версии.</div>`; wireButtons(); }
   function renderMore(app){ app.innerHTML=pageTitle('Ещё','Дополнительные разделы.')+`<div class="grid"><a class="btn" href="#contracts">Контракты</a><a class="btn" href="#wheel">Колесо</a><a class="btn" href="#battle">Battle</a><a class="btn" href="#promo">Промо</a><a class="btn" href="#ads">Реклама</a><a class="btn" href="#profile">Профиль</a><a class="btn" href="#install">Установка</a></div>`; wireButtons(); }
@@ -299,7 +368,7 @@
   window.addEventListener('hashchange', route);
   window.addEventListener('pageshow', ()=>{ route(); wireButtons(); });
   document.addEventListener('DOMContentLoaded', ()=>{
-    try{ if(location.search.includes('clear=mobile-clean-v3')) localStorage.removeItem(SAVE_KEY); }catch(e){}
+    try{ if(location.search.includes('clear=mobile-clean-v4')) localStorage.removeItem(SAVE_KEY); }catch(e){}
     if(!location.hash) location.hash='home';
     route(); wireButtons();
     setTimeout(loadRealCatalog, 100);

@@ -8,4 +8,4 @@
 - мобильные кнопки через click/touch/pointer;
 - без service worker.
 
-Открывать: `index.html?clear=mobile-clean-v3`.
+Открывать: `index.html?clear=mobile-clean-v4`.
