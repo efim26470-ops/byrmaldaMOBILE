@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 620">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#10182b"/><stop offset="1" stop-color="#0a1020"/></linearGradient>
+    <linearGradient id="ak" x1="0" x2="1"><stop stop-color="#111827"/><stop offset=".5" stop-color="#ef4444"/><stop offset="1" stop-color="#0f172a"/></linearGradient>
+    <linearGradient id="awp" x1="0" x2="1"><stop stop-color="#38bdf8"/><stop offset=".45" stop-color="#8b5cf6"/><stop offset="1" stop-color="#f97316"/></linearGradient>
+    <linearGradient id="knife" x1="0" x2="1"><stop stop-color="#22d3ee"/><stop offset=".55" stop-color="#8b5cf6"/><stop offset="1" stop-color="#f43f5e"/></linearGradient>
+    <radialGradient id="glow" cx="50%" cy="44%" r="58%"><stop stop-color="#ff7a18" stop-opacity=".28"/><stop offset="1" stop-color="#0a1020" stop-opacity="0"/></radialGradient>
+    <filter id="s"><feDropShadow dx="0" dy="24" stdDeviation="18" flood-color="#000" flood-opacity=".45"/></filter>
+  </defs>
+  <rect width="920" height="620" rx="54" fill="url(#bg)"/>
+  <circle cx="455" cy="295" r="285" fill="url(#glow)"/>
+  <g filter="url(#s)">
+    <rect x="120" y="118" width="680" height="382" rx="44" fill="#0b1220" stroke="#263247" stroke-width="8"/>
+    <rect x="155" y="158" width="610" height="112" rx="24" fill="rgba(255,255,255,.06)"/>
+    <rect x="155" y="300" width="610" height="112" rx="24" fill="rgba(255,255,255,.055)"/>
+    <g transform="translate(188 184)">
+      <path d="M22 56h325l26-31h105c30 0 54 17 66 43l22 45h-80l-14-28h-92l-39 43h-82l39-43H126l-31 34H18l28-39H18c-35 0-35-24 4-24z" fill="url(#ak)"/>
+      <path d="M104 29h180l30-38h82l-31 38h113c25 0 44 12 52 31H74c5-19 15-31 30-31z" fill="#f8fafc" opacity=".19"/>
+      <path d="M165 74h105M344 58h135" stroke="#0b1020" stroke-width="12" stroke-linecap="round" opacity=".5"/>
+      <text x="0" y="150" font-family="Inter,Arial" font-size="24" font-weight="900" fill="#f8fafc">AK-47 | Redline</text>
+    </g>
+    <g transform="translate(210 330)">
+      <path d="M20 60h360l38-38h70c36 0 68 18 83 46l24 45h-88l-16-27h-80l-62 40H260l56-40H145l-42 32H30l36-38H20c-34 0-34-20 0-20z" fill="url(#awp)"/>
+      <path d="M119 33h250l44-40h74l-41 40h116c22 0 40 9 50 25H92c8-16 16-25 27-25z" fill="#e5e7eb" opacity=".22"/>
+      <circle cx="535" cy="108" r="18" fill="#0b1020" opacity=".78"/>
+      <text x="0" y="150" font-family="Inter,Arial" font-size="24" font-weight="900" fill="#f8fafc">AWP | Hyper Beast</text>
+    </g>
+    <g transform="translate(544 136) rotate(8)">
+      <rect x="0" y="0" width="230" height="128" rx="28" fill="rgba(255,255,255,.065)" stroke="rgba(255,255,255,.12)"/>
+      <path d="M50 75C70 30 125 16 190 25c-40 13-69 34-94 61 34-14 74-17 126-9-27 29-62 47-108 56-45 9-88-9-132-42z" fill="url(#knife)" transform="translate(12 -5)"/>
+      <circle cx="51" cy="74" r="18" fill="none" stroke="#e0f2fe" stroke-width="8"/>
+      <text x="24" y="108" font-family="Inter,Arial" font-size="18" font-weight="900" fill="#f8fafc">★ Karambit | Doppler</text>
+    </g>
+  </g>
+</svg>
