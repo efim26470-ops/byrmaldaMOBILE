@@ -2,8 +2,8 @@
 (function(){
   'use strict';
 
-  const VERSION = 'mobile-clean-6.0.0';
-  const SAVE_KEY = 'cs2_mobile_clean_save_v6';
+  const VERSION = 'mobile-clean-7.0.0';
+  const SAVE_KEY = 'cs2_mobile_clean_save_v7';
   const CURRENCY = '₽LC';
   const START_BALANCE = 15000;
   const WHEEL_COOLDOWN = 2 * 60 * 60 * 1000;
@@ -197,24 +197,36 @@
     ];
     const official = officialNames.map((x,i)=>({id:x[0],name:x[1],price:x[2],image:FALLBACK_CASE_IMAGES[x[1]]||casePlaceholder(x[1]),items:rotatePool(skinsOnly.concat(knives,gloves),i*3,32),profit:.18+(i%6)*.035,kind:'case',source:'CS2 Case'}));
     const qualityCase = (id,name,price,filter,profit=.25,color='#4b69ff') => makeSpecialCase(id,name,price,skinsOnly.filter(filter).concat(skinsOnly).slice(0,40),profit,color);
+    const collectiblePool = pool.filter(i=>i.type==='sticker' && /coin|pin|medal|collectible|service/i.test(i.name));
     const special = [
-      qualityCase('blue-case','Blue Mil-Spec Case',260,i=>['Mil-Spec Grade','Industrial Grade'].includes(i.rarity),.38,'#4b69ff'),
-      qualityCase('green-case','Green Industrial Case',180,i=>['Consumer Grade','Industrial Grade'].includes(i.rarity),.42,'#22c55e'),
-      qualityCase('purple-case','Purple Restricted Case',850,i=>i.rarity==='Restricted'||i.rarity==='Classified',.27,'#8847ff'),
-      qualityCase('pink-case','Pink Classified Case',2200,i=>i.rarity==='Classified'||i.rarity==='Covert',.22,'#ec4899'),
-      qualityCase('red-case','Red Covert Case',5600,i=>i.rarity==='Covert',.17,'#ef4444'),
-      qualityCase('premium-case','Premium Rifle Case',9800,i=>/AK-47|M4A1|M4A4|AWP/.test(i.name),.16,'#f59e0b'),
-      makeSpecialCase('knife-case','Knife Case',36000,knives.length?knives:pool.filter(i=>i.type==='knife'),.14,'#f59e0b'),
-      makeSpecialCase('gloves-case','Gloves Case',29000,gloves.length?gloves:pool.filter(i=>i.type==='glove'),.15,'#8b5cf6'),
-      makeSpecialCase('knife-glove-case','Knives & Gloves Case',42000,knives.concat(gloves),.13,'#f97316'),
+      makeSpecialCase('budget-random','Budget Random Case',85,skinsOnly.filter(i=>i.value<=450),.42,'#4b69ff'),
+      makeSpecialCase('budget-green','Cheap Green Case',120,skinsOnly.filter(i=>i.value<=650 && ['High Grade','Base Grade','Industrial Grade','Mil-Spec Grade'].includes(i.rarity)),.40,'#22c55e'),
+      makeSpecialCase('mid-risk','Risky Mid Case',520,skinsOnly.filter(i=>i.value>=180 && i.value<=2600),.28,'#8b5cf6'),
+      makeSpecialCase('profit-hunter','Profit Hunter Case',780,skinsOnly.filter(i=>i.value>=300 && i.value<=5000),.25,'#ec4899'),
+      makeSpecialCase('highroller-red','High Roller Red Case',2800,skinsOnly.filter(i=>i.value>=900),.18,'#ef4444'),
+      makeSpecialCase('quality-consumer','Grey / Consumer Case',120,skinsOnly.filter(i=>['Consumer Grade','Base Grade'].includes(i.rarity)),.42,'#6b7280'),
+      makeSpecialCase('quality-industrial','Light Blue Industrial Case',220,skinsOnly.filter(i=>i.rarity==='Industrial Grade'),.39,'#38bdf8'),
+      makeSpecialCase('quality-green','Green High Grade / Charms Case',310,skinsOnly.filter(i=>['High Grade','Base Grade'].includes(i.rarity)).concat(charms).concat(stickers).slice(0,60),.36,'#22c55e'),
+      makeSpecialCase('quality-milspec','Blue Mil-Spec Case',430,skinsOnly.filter(i=>i.rarity==='Mil-Spec Grade'),.34,'#4b69ff'),
+      makeSpecialCase('quality-restricted','Purple Restricted Case',820,skinsOnly.filter(i=>i.rarity==='Restricted'),.26,'#8847ff'),
+      makeSpecialCase('quality-classified','Pink Classified Case',1500,skinsOnly.filter(i=>i.rarity==='Classified'),.22,'#ec4899'),
+      makeSpecialCase('quality-covert','Red Covert Case',2700,skinsOnly.filter(i=>i.rarity==='Covert'),.17,'#ef4444'),
+      makeSpecialCase('special-knives','Knife Case',5400,knives,.14,'#f59e0b'),
+      makeSpecialCase('special-gloves','Gloves Case',5200,gloves,.15,'#8b5cf6'),
+      makeSpecialCase('special-rare','Knives & Gloves Case',6500,knives.concat(gloves),.13,'#f97316'),
       makeSpecialCase('stickers-all','Sticker Capsule',280,stickers,.40,'#4b69ff'),
-      makeSpecialCase('stickers-tournament','Tournament Stickers Case',390,stickers.filter(i=>/copenhagen|shanghai|austin|paris|antwerp|stockholm|rio|katowice|cologne|berlin|krakow|atlanta/i.test(i.name)),.38,'#8b5cf6'),
-      makeSpecialCase('agents-case','Agents Case',1250,agents,.34,'#ef4444'),
-      makeSpecialCase('master-agents','Master Agents Case',2400,agents.filter(i=>/master/i.test(i.rarity)),.22,'#eab308'),
-      makeSpecialCase('charms-case','Armory Charms Case',620,charms,.35,'#22c55e'),
-      makeSpecialCase('patches-case','Patches Case',520,patches,.35,'#06b6d4'),
-      makeSpecialCase('charms-patches-case','Charms & Patches Case',650,charms.concat(patches),.35,'#84cc16')
-    ].filter(c=>c.items && c.items.length);
+      makeSpecialCase('stickers-tournament','Tournament Stickers Case',360,stickers.filter(i=>/major|copenhagen|shanghai|austin|paris|antwerp|stockholm|rio|katowice|cologne|berlin|krakow|atlanta/i.test(i.name)),.38,'#8b5cf6'),
+      makeSpecialCase('stickers-copenhagen','Copenhagen Stickers Capsule',390,stickers.filter(i=>/copenhagen 2024/i.test(i.name)),.38,'#60a5fa'),
+      makeSpecialCase('stickers-shanghai','Shanghai Stickers Capsule',390,stickers.filter(i=>/shanghai 2024/i.test(i.name)),.38,'#06b6d4'),
+      makeSpecialCase('stickers-austin','Austin Stickers Capsule',390,stickers.filter(i=>/austin 2025/i.test(i.name)),.38,'#10b981'),
+      makeSpecialCase('stickers-paris','Paris Stickers Capsule',390,stickers.filter(i=>/paris 2023/i.test(i.name)),.38,'#f472b6'),
+      makeSpecialCase('agents-all','Agents Case',900,agents,.32,'#ef4444'),
+      makeSpecialCase('agents-master','Master Agents Case',2300,agents.filter(i=>/master/i.test(i.rarity)),.22,'#eab308'),
+      makeSpecialCase('charms-all','Armory Charms Case',420,charms,.35,'#22c55e'),
+      makeSpecialCase('charms-small-arms','Small Arms Charms Case',470,charms.filter(i=>/small arms|charm/i.test(i.name)),.35,'#84cc16'),
+      makeSpecialCase('patches-all','Patches Case',330,patches,.35,'#06b6d4'),
+      makeSpecialCase('collectibles-all','Collectibles Case',260,collectiblePool.length?collectiblePool:stickers,.33,'#f59e0b')
+    ].filter(c=>c && c.items && c.items.length);
     return official.concat(special);
   }
 
@@ -253,7 +265,7 @@
       const wanted = ['AK-47 | Redline','AK-47 | Vulcan','AK-47 | The Empress','AK-47 | Head Shot','AK-47 | Legion of Anubis','AK-47 | Ice Coaled','AK-47 | Slate','M4A1-S | Printstream','M4A1-S | Decimator','M4A1-S | Nightmare','M4A1-S | Player Two','M4A4 | Temukau','M4A4 | Neo-Noir','AWP | Asiimov','AWP | Hyper Beast','AWP | Duality','AWP | Fever Dream','AWP | Neo-Noir','AWP | Chromatic Aberration','Desert Eagle | Printstream','Desert Eagle | Ocean Drive','USP-S | Kill Confirmed','USP-S | Cortex','Glock-18 | Water Elemental','Glock-18 | Bullet Queen','P250 | Asiimov','Tec-9 | Isaac','MP9 | Food Chain','MAC-10 | Neon Rider','P90 | Death Grip','SSG 08 | Fever Dream','FAMAS | Mecha Industries','Galil AR | Chatterbox','★ Karambit | Doppler','★ Karambit | Gamma Doppler','★ Butterfly Knife | Doppler','★ M9 Bayonet | Fade','★ Bayonet | Tiger Tooth','★ Sport Gloves | Vice','★ Driver Gloves | King Snake'];
       const byName = new Map(skins.map(x=>[String(x.name||'').toLowerCase(),x]));
       let realItems = wanted.map(n=>byName.get(n.toLowerCase())).filter(Boolean).map(x=>normItem(x, itemTypeFromName(x.name,'skin')));
-      skins.forEach(x=>{ if(realItems.length<180 && x.image && !realItems.some(i=>i.name===x.name)) realItems.push(normItem(x, itemTypeFromName(x.name,'skin'))); });
+      skins.forEach(x=>{ if(realItems.length<320 && x.image && !realItems.some(i=>i.name===x.name)) realItems.push(normItem(x, itemTypeFromName(x.name,'skin'))); });
       const stickerItems = stickers.filter(x=>x.image).slice(0,120).map(x=>normItem(x,'sticker'));
       const agentItems = agents.filter(x=>x.image).slice(0,40).map(x=>normItem(x,'agent'));
       const charmItems = charms.filter(x=>x.image).slice(0,40).map(x=>normItem(x,'charm'));
@@ -262,17 +274,17 @@
       items = realItems.concat(stickerItems, agentItems, charmItems, patchItems, collectibleItems).filter(uniqueByName);
 
       const preferredCases = ['Kilowatt Case','Revolution Case','Recoil Case','Dreams & Nightmares Case','Fracture Case','Clutch Case','Prisma 2 Case','Spectrum 2 Case','Operation Riptide Case','Snakebite Case','Horizon Case','Gamma 2 Case','Danger Zone Case','CS20 Case','Glove Case','Operation Broken Fang Case','Chroma 3 Case','Falchion Case','Shadow Case','Winter Offensive Weapon Case','Gallery Case','Fever Case','Operation Wildfire Case','Operation Vanguard Weapon Case','Huntsman Weapon Case','Operation Phoenix Weapon Case','CS:GO Weapon Case 2','CS:GO Weapon Case 3','Operation Breakout Weapon Case','Operation Bravo Case','CS:GO Weapon Case'];
-      const preferredCollections = ['The Graphic Design Collection','The Sport & Field Collection','The Overpass 2024 Collection','The Gallery Collection','The Armory Collection','The Ascent Collection','The Boreal Collection','The Radiant Collection','The Anubis Collection','The 2021 Mirage Collection','The 2021 Dust 2 Collection','The 2021 Vertigo Collection','The Ancient Collection','The Norse Collection','The Canals Collection','The St. Marc Collection'];
+      const preferredCollections = ['The Graphic Design Collection','The Sport & Field Collection','The Overpass 2024 Collection','The Gallery Collection','The Armory Collection','The Ascent Collection','The Boreal Collection','The Radiant Collection','The Anubis Collection','The 2021 Mirage Collection','The 2021 Dust 2 Collection','The 2021 Vertigo Collection','The Ancient Collection','The Norse Collection','The Canals Collection','The St. Marc Collection','The Cobblestone Collection','The Cache Collection','The Overpass Collection','The Gods and Monsters Collection','The Chop Shop Collection','The Control Collection','The Havoc Collection'];
 
       const allCrates = crates.filter(c => c && Array.isArray(c.contains) && c.contains.length > 3);
       const casesRaw = allCrates.filter(c => /case/i.test(String((c.type||'') + ' ' + (c.name||''))));
       const collectionsRaw = allCrates.filter(c => /collection/i.test(String((c.type||'') + ' ' + (c.name||''))));
       const pickedCases = [];
       preferredCases.forEach(name => { const f = casesRaw.find(c => c.name === name); if(f && !pickedCases.includes(f)) pickedCases.push(f); });
-      casesRaw.forEach(c => { if(pickedCases.length < 42 && !pickedCases.includes(c)) pickedCases.push(c); });
+      casesRaw.forEach(c => { if(pickedCases.length < 80 && !pickedCases.includes(c)) pickedCases.push(c); });
       const pickedCollections = [];
       preferredCollections.forEach(name => { const f = collectionsRaw.find(c => c.name === name); if(f && !pickedCollections.includes(f)) pickedCollections.push(f); });
-      collectionsRaw.forEach(c => { if(pickedCollections.length < 18 && !pickedCollections.includes(c)) pickedCollections.push(c); });
+      collectionsRaw.forEach(c => { if(pickedCollections.length < 50 && !pickedCollections.includes(c)) pickedCollections.push(c); });
 
       function mapCrate(c, idx, kind='case'){
         const rawPool = ([]).concat(Array.isArray(c.contains)?c.contains:[], Array.isArray(c.contains_rare)?c.contains_rare:[]);
@@ -299,27 +311,33 @@
       const collectibleOnly = collectibleItems;
 
       realCases = realCases.concat([
-        makeSpecialCase('budget-blue','Budget Blue Case',240,skinsOnly.filter(x=>['Mil-Spec Grade','Restricted','Industrial Grade'].includes(x.rarity)).slice(0,40),.34,'#4b69ff'),
-        makeSpecialCase('green-industrial','Green Industrial Case',160,skinsOnly.filter(x=>['Consumer Grade','Industrial Grade','Mil-Spec Grade'].includes(x.rarity)).slice(0,40),.42,'#22c55e'),
-        makeSpecialCase('purple-restricted','Purple Restricted Case',850,skinsOnly.filter(x=>['Restricted','Classified'].includes(x.rarity)).slice(0,40),.27,'#8847ff'),
-        makeSpecialCase('pink-classified','Pink Classified Case',2300,skinsOnly.filter(x=>['Classified','Covert'].includes(x.rarity)).slice(0,40),.22,'#ec4899'),
-        makeSpecialCase('red-covert','Red Covert Case',5600,skinsOnly.filter(x=>['Covert'].includes(x.rarity)).slice(0,40),.16,'#ef4444'),
-        makeSpecialCase('high-roller','High Roller Case',12500,skinsOnly.filter(x=>x.value>5000).concat(knives).slice(0,40),.13,'#f59e0b'),
-        makeSpecialCase('knife-case','Knife Case',36000,knives,.14,'#f59e0b'),
-        makeSpecialCase('gloves-case','Gloves Case',29000,gloves,.15,'#8b5cf6'),
-        makeSpecialCase('knife-glove-case','Knives & Gloves Case',42000,knives.concat(gloves),.13,'#f97316'),
+        makeSpecialCase('budget-random','Budget Random Case',85,skinsOnly.filter(i=>i.value<=450),.42,'#4b69ff'),
+        makeSpecialCase('budget-green','Cheap Green Case',120,skinsOnly.filter(i=>i.value<=650 && ['High Grade','Base Grade','Industrial Grade','Mil-Spec Grade'].includes(i.rarity)),.40,'#22c55e'),
+        makeSpecialCase('mid-risk','Risky Mid Case',520,skinsOnly.filter(i=>i.value>=180 && i.value<=2600),.28,'#8b5cf6'),
+        makeSpecialCase('profit-hunter','Profit Hunter Case',780,skinsOnly.filter(i=>i.value>=300 && i.value<=5000),.25,'#ec4899'),
+        makeSpecialCase('highroller-red','High Roller Red Case',2800,skinsOnly.filter(i=>i.value>=900),.18,'#ef4444'),
+        makeSpecialCase('quality-consumer','Grey / Consumer Case',120,skinsOnly.filter(i=>['Consumer Grade','Base Grade'].includes(i.rarity)),.42,'#6b7280'),
+        makeSpecialCase('quality-industrial','Light Blue Industrial Case',220,skinsOnly.filter(i=>i.rarity==='Industrial Grade'),.39,'#38bdf8'),
+        makeSpecialCase('quality-green','Green High Grade / Charms Case',310,skinsOnly.filter(i=>['High Grade','Base Grade'].includes(i.rarity)).concat(charmsOnly).concat(stickersOnly).slice(0,60),.36,'#22c55e'),
+        makeSpecialCase('quality-milspec','Blue Mil-Spec Case',430,skinsOnly.filter(i=>i.rarity==='Mil-Spec Grade'),.34,'#4b69ff'),
+        makeSpecialCase('quality-restricted','Purple Restricted Case',820,skinsOnly.filter(i=>i.rarity==='Restricted'),.26,'#8847ff'),
+        makeSpecialCase('quality-classified','Pink Classified Case',1500,skinsOnly.filter(i=>i.rarity==='Classified'),.22,'#ec4899'),
+        makeSpecialCase('quality-covert','Red Covert Case',2700,skinsOnly.filter(i=>i.rarity==='Covert'),.17,'#ef4444'),
+        makeSpecialCase('special-knives','Knife Case',5400,knives,.14,'#f59e0b'),
+        makeSpecialCase('special-gloves','Gloves Case',5200,gloves,.15,'#8b5cf6'),
+        makeSpecialCase('special-rare','Knives & Gloves Case',6500,knives.concat(gloves),.13,'#f97316'),
         makeSpecialCase('stickers-all','Sticker Capsule',280,stickersOnly,.40,'#4b69ff'),
-        makeSpecialCase('stickers-tournament','Tournament Stickers Case',390,stickersOnly.filter(x=>/copenhagen|shanghai|austin|paris|antwerp|stockholm|rio|katowice|cologne|berlin|krakow|atlanta/i.test(x.name)).slice(0,80),.38,'#8b5cf6'),
-        makeSpecialCase('stickers-copenhagen','Copenhagen Stickers Capsule',390,stickersOnly.filter(x=>/copenhagen 2024/i.test(x.name)).slice(0,80),.38,'#60a5fa'),
-        makeSpecialCase('stickers-shanghai','Shanghai Stickers Capsule',390,stickersOnly.filter(x=>/shanghai 2024/i.test(x.name)).slice(0,80),.38,'#06b6d4'),
-        makeSpecialCase('stickers-austin','Austin Stickers Capsule',390,stickersOnly.filter(x=>/austin 2025/i.test(x.name)).slice(0,80),.38,'#10b981'),
-        makeSpecialCase('stickers-paris','Paris Stickers Capsule',390,stickersOnly.filter(x=>/paris 2023/i.test(x.name)).slice(0,80),.38,'#f472b6'),
-        makeSpecialCase('agents-case','Agents Case',1250,agentsOnly,.34,'#ef4444'),
-        makeSpecialCase('master-agents','Master Agents Case',2400,agentsOnly.filter(x=>/master/i.test(x.rarity)),.22,'#eab308'),
-        makeSpecialCase('charms-case','Armory Charms Case',620,charmsOnly,.35,'#22c55e'),
-        makeSpecialCase('patches-case','Patches Case',520,patchesOnly,.35,'#06b6d4'),
-        makeSpecialCase('charms-patches-case','Charms & Patches Case',650,charmsOnly.concat(patchesOnly),.35,'#84cc16'),
-        makeSpecialCase('collectibles-case','Collectibles Case',520,collectibleOnly,.33,'#f59e0b')
+        makeSpecialCase('stickers-tournament','Tournament Stickers Case',360,stickersOnly.filter(i=>/major|copenhagen|shanghai|austin|paris|antwerp|stockholm|rio|katowice|cologne|berlin|krakow|atlanta/i.test(i.name)),.38,'#8b5cf6'),
+        makeSpecialCase('stickers-copenhagen','Copenhagen Stickers Capsule',390,stickersOnly.filter(i=>/copenhagen 2024/i.test(i.name)),.38,'#60a5fa'),
+        makeSpecialCase('stickers-shanghai','Shanghai Stickers Capsule',390,stickersOnly.filter(i=>/shanghai 2024/i.test(i.name)),.38,'#06b6d4'),
+        makeSpecialCase('stickers-austin','Austin Stickers Capsule',390,stickersOnly.filter(i=>/austin 2025/i.test(i.name)),.38,'#10b981'),
+        makeSpecialCase('stickers-paris','Paris Stickers Capsule',390,stickersOnly.filter(i=>/paris 2023/i.test(i.name)),.38,'#f472b6'),
+        makeSpecialCase('agents-all','Agents Case',900,agentsOnly,.32,'#ef4444'),
+        makeSpecialCase('agents-master','Master Agents Case',2300,agentsOnly.filter(i=>/master/i.test(i.rarity)),.22,'#eab308'),
+        makeSpecialCase('charms-all','Armory Charms Case',420,charmsOnly,.35,'#22c55e'),
+        makeSpecialCase('charms-small-arms','Small Arms Charms Case',470,charmsOnly.filter(i=>/small arms|charm/i.test(i.name)),.35,'#84cc16'),
+        makeSpecialCase('patches-all','Patches Case',330,patchesOnly,.35,'#06b6d4'),
+        makeSpecialCase('collectibles-all','Collectibles Case',260,collectibleOnly,.33,'#f59e0b')
       ]);
       cases = realCases.filter(c=>c.items && c.items.length).filter(uniqueCaseById);
       if(cases.length < 20) cases = buildFallbackCases(items);
@@ -335,7 +353,7 @@
     const n=String(name).toLowerCase();
     const m = [
       ['kilowatt',840], ['revolution',620], ['recoil',690], ['dream',760], ['snake',420], ['fracture',390], ['clutch',620], ['prisma 2',520], ['spectrum 2',740], ['gamma 2',980], ['glove',1400], ['chroma 3',650],
-      ['horizon',560], ['danger zone',470], ['cs20',820], ['broken fang',1150], ['riptide',1750], ['gallery',780], ['fever',640], ['prisma',620], ['spectrum',940], ['chroma 2',850], ['chroma case',760], ['falchion',780], ['shadow',720], ['wildfire',1550], ['vanguard',2800], ['phoenix',1900], ['huntsman',2200]
+      ['horizon',560], ['danger zone',470], ['cs20',820], ['broken fang',1150], ['riptide',1750], ['gallery',780], ['fever',640], ['prisma',620], ['spectrum',940], ['chroma 2',850], ['chroma case',760], ['falchion',780], ['shadow',720], ['wildfire',1550], ['vanguard',2800], ['phoenix',1900], ['huntsman',2200], ['winter offensive',2100], ['breakout',2400], ['bravo',8600], ['weapon case 2',9800], ['weapon case 3',9200], ['weapon case',15000]
     ];
     const hit=m.find(([k])=>n.includes(k));
     if(hit) return hit[1];
@@ -387,7 +405,7 @@
   function heroSkin(i){ const fb=placeholderFor(i.name,i.type); return `<div class="hero-skin"><img src="${esc(i.image||fb)}" data-fallback="${esc(fb)}" alt="${esc(i.name)}" onerror="this.onerror=null;this.src=this.dataset.fallback"><b>${esc(i.name)}</b><span>${esc(i.rarity)}</span></div>`; }
   function caseCard(c){ const fb=casePlaceholder(c.name); const kind=(c.kind==='collection'?'Коллекция':(c.kind==='special'?'Спецкейс':'Кейс')); const source=c.source||'CS2'; return `<article class="case-card"><div class="case-topline"><span class="case-label">${esc(kind)}</span><span class="case-source">${esc(source)}</span></div><div class="case-img-wrap"><img src="${esc(c.image||fb)}" data-fallback="${esc(fb)}" onerror="this.onerror=null;this.src=this.dataset.fallback" alt="${esc(c.name)}"></div><h3>${esc(c.name)}</h3><div class="case-meta"><span>${c.items.length} предметов</span><b class="price">${fmt(c.price)}</b></div><div class="chips">${[...new Set(c.items.map(i=>i.rarity))].slice(0,4).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div><div class="case-actions"><button class="btn primary" type="button" data-action="open-case" data-case="${esc(c.id)}">Крутить</button><button class="btn" type="button" data-action="case-pool" data-case="${esc(c.id)}">Пул</button></div></article>`; }
   function itemCard(it, opts={}){ const actions=opts.actions||''; const fb=placeholderFor(it.name,it.type); return `<article class="item-card ${opts.selected?'selected':''}" style="--rar:${it.rarityColor||'#60a5fa'}" data-uid="${esc(it.uid||'')}"><div class="item-art"><img src="${esc(it.image||fb)}" data-fallback="${esc(fb)}" onerror="this.onerror=null;this.src=this.dataset.fallback" alt="${esc(it.name)}"></div><h4>${esc(it.name)}</h4><small>${esc(it.rarity)}${it.wear?' · '+esc(it.wear):''}</small><div class="item-value"><b>${fmt(it.value)}</b>${opts.badge?`<span class="chip">${opts.badge}</span>`:''}</div>${actions?`<div class="item-actions">${actions}</div>`:''}</article>`; }
-  function renderCases(app){ app.innerHTML=pageTitle('Кейсы', (apiLoaded?'Каталог приближен к десктопной версии: больше кейсов, коллекций и спецпулов.':'Резервный каталог уже содержит много разных кейсов и спецпулов.') + ' Всего: ' + cases.length)+`<div class="grid">${cases.map(caseCard).join('')}</div>`; wireButtons(); }
+  function renderCases(app){ app.innerHTML=pageTitle('Кейсы', (apiLoaded?'Оснащение кейсов синхронизировано с десктопной версией: больше официальных кейсов, коллекций и спецпулов.':'Резервный каталог тоже собран по структуре десктопной версии.') + ' Всего: ' + cases.length)+`<div class="grid">${cases.map(caseCard).join('')}</div>`; wireButtons(); }
   function renderInventory(app){ const total=state.inventory.reduce((s,i)=>s+i.value,0); app.innerHTML=pageTitle('Инвентарь','Продажа, сортировка и отправка в апгрейд.')+`<div class="notice"><b>Стоимость инвентаря:</b> ${fmt(total)}</div><div class="row section"><button class="btn green" data-action="sell-all" ${state.inventory.length?'':'disabled'}>Продать всё</button><button class="btn" data-action="sort-inv">Сортировать</button></div>${state.inventory.length?`<div class="grid">${state.inventory.map(i=>itemCard(i,{actions:`<button data-action="sell-item" data-uid="${i.uid}">Продать</button><button data-action="to-upgrade" data-uid="${i.uid}">Апгрейд</button>`})).join('')}</div>`:'<div class="empty">Инвентарь пуст.</div>'}`; wireButtons(); }
   function renderUpgrade(app){ const own=state.inventory[0]; const pool=items.filter(i=>['skin','knife','glove'].includes(i.type)&&i.value>(own?own.value:0)).sort((a,b)=>a.value-b.value).slice(0,36); app.innerHTML=pageTitle('Апгрейд','Выбери свой предмет и цель.')+(own?`<div class="notice">Твой предмет: <b>${esc(own.name)}</b> · ${fmt(own.value)}</div>`:'<div class="notice">Сначала выбей предмет.</div>')+`<div class="grid two">${pool.map(i=>itemCard(i,{badge:'цель',actions:`<button class="btn small" data-action="upgrade" data-target="${esc(i.id)}">Цель</button>`})).join('')}</div>`; wireButtons(); }
   function renderContracts(app){ const selected=state.inventory.slice(0,10); app.innerHTML=pageTitle('Контракты','Первые 3–10 предметов инвентаря участвуют в контракте.')+`<div class="notice">Выбрано: <b>${Math.min(selected.length,10)}</b>. Нужно минимум 3.</div><button class="btn primary" data-action="contract" ${selected.length>=3?'':'disabled'}>Собрать контракт</button><div class="grid section">${selected.map(i=>itemCard(i,{selected:true})).join('')}</div>`; wireButtons(); }
@@ -454,7 +472,7 @@
   window.addEventListener('hashchange', route);
   window.addEventListener('pageshow', ()=>{ route(); wireButtons(); });
   document.addEventListener('DOMContentLoaded', ()=>{
-    try{ if(location.search.includes('clear=mobile-clean-v6')) localStorage.removeItem(SAVE_KEY); }catch(e){}
+    try{ if(location.search.includes('clear=mobile-clean-v7')) localStorage.removeItem(SAVE_KEY); }catch(e){}
     if(!location.hash) location.hash='home';
     route(); wireButtons();
     setTimeout(loadRealCatalog, 100);
