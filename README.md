@@ -1,28 +1,11 @@
-# CS2 Mobile Lab — clean mobile build
+# CS2 Mobile Lab — clean v3
 
-Отдельная мобильная сборка с нуля. Работает как статический сайт на GitHub Pages.
+Отдельная мобильная сборка для GitHub Pages.
 
-## Загрузка на GitHub Pages
+- один `index.html`;
+- реальные изображения предметов/кейсов через открытый CS2-каталог ByMykel;
+- локальный fallback, если CDN недоступен;
+- мобильные кнопки через click/touch/pointer;
+- без service worker.
 
-Загрузи в отдельный репозиторий или отдельную папку все файлы из этой папки:
-
-- `index.html`
-- `styles.css`
-- `app.js`
-- `manifest.webmanifest`
-- `favicon.svg`
-- `assets/`
-
-Открывай на телефоне через Safari/Chrome. Для iPhone лучше добавить на экран домой через Safari.
-
-## Промокоды
-
-- `WELCOMEMOBILE` — 5 000 ₽LC
-- `IOSFIX` — 10 000 ₽LC
-- `FASTCASE` — 3 000 ₽LC
-- `MOBILEKING` — 15 000 ₽LC
-- `TEST100K` — 100 000 ₽LC
-
-
-## v2
-Картинки кейсов и ключевых скинов заменены на реальные URL, SVG оставлены только внутри старых ассетов и не используются в карточках. Дополнительно включена фоновая подгрузка изображений из открытого CS2-каталога ByMykel.
+Открывать: `index.html?clear=mobile-clean-v3`.
